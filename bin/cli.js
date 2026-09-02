@@ -4,11 +4,15 @@ var fs = require('fs'),
     tty = require('tty'),
     statik = require('./../lib/node-static');
 
-    var argv = require('optimist')
+    var yargs = require('yargs');
+
+    yargs
         .usage([
             'USAGE: $0 [-p <port>] [<directory>]',
             'simple, rfc 2616 compliant file streaming module for node']
             .join('\n\n'))
+        .help(false)
+        .version(false)
         .option('port', {
             alias: 'p',
             'default': 8080,
@@ -50,8 +54,9 @@ var fs = require('fs'),
         .option('help', {
             alias: 'h',
             description: 'display this help message'
-        })
-        .argv;
+        });
+
+    var argv = yargs.argv;
 
     var dir = argv._[0] || '.';
 
@@ -73,7 +78,7 @@ var fs = require('fs'),
     var file, options;
 
 if (argv.help) {
-    require('optimist').showHelp(console.log);
+    yargs.showHelp(console.log);
     process.exit(0);
 }
 
