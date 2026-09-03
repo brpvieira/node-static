@@ -395,5 +395,22 @@ suite.addBatch({
       assert.equal(response.statusCode, 404);
     }
   }
+}).addBatch({
+  // CVE-2023-26111 / GHSA-5g97-whc9-8g7j: a plain string-prefix check on the
+  // resolved path (e.g. `pathname.startsWith(root)` or
+  // `pathname.indexOf(root) === 0`) is fooled by a sibling directory whose
+  // name happens to start with the root's name, e.g. root "fixtures" also
+  // matches "fixtures-secret". This must be rejected instead of served.
+  'escaping the root via a sibling directory with a matching prefix': {
+    topic : function(){
+      request.get(TEST_SERVER + '/../fixtures-secret/secret.txt', this.callback);
+    },
+    'should respond with 403' : function(error, response, body){
+      assert.equal(response.statusCode, 403);
+    },
+    'should not leak the sibling directory contents': function(error, response, body){
+      assert.equal(/top secret/.test(body), false);
+    }
+  }
 }).export(module);
 
